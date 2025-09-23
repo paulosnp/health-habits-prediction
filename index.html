@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Saúde v2</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <header>
+            <h1>Análise de Saúde Completa</h1>
+            <p>Explore os dados de saúde com filtros dinâmicos.</p>
+        </header>
+
+        <div class="dashboard-content">
+
+            <aside class="filter-sidebar">
+                <h2>Filtros</h2>
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="gender-filter">Gênero:</label>
+                        <select id="gender-filter">
+                            <option value="Todos">Todos</option>
+                            <option value="Male">Masculino</option>
+                            <option value="Female">Feminino</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="chart-type-selector">Tipo de Gráfico:</label>
+                        <select id="chart-type-selector">
+                            <option value="bar">Barras</option>
+                            <option value="pie">Pizza</option>
+                            <option value="doughnut">Rosca</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Idade (anos):</label>
+                        <div class="input-group">
+                            <input type="number" id="min-age" placeholder="Min">
+                            <input type="number" id="max-age" placeholder="Max">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>Altura (cm):</label>
+                        <div class="input-group">
+                            <input type="number" id="min-height" placeholder="Min">
+                            <input type="number" id="max-height" placeholder="Max">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>Peso (kg):</label>
+                        <div class="input-group">
+                            <input type="number" id="min-weight" placeholder="Min">
+                            <input type="number" id="max-weight" placeholder="Max">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>Cintura (cm):</label>
+                        <div class="input-group">
+                            <input type="number" id="min-waistline" placeholder="Min">
+                            <input type="number" id="max-waistline" placeholder="Max">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>Visão (Esq.):</label>
+                        <div class="input-group">
+                            <input type="number" id="min-sight-left" placeholder="Min" step="0.1">
+                            <input type="number" id="max-sight-left" placeholder="Max" step="0.1">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>Visão (Dir.):</label>
+                        <div class="input-group">
+                            <input type="number" id="min-sight-right" placeholder="Min" step="0.1">
+                            <input type="number" id="max-sight-right" placeholder="Max" step="0.1">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>Audição (Esq.):</label>
+                        <select id="hear-left-filter">
+                            <option value="Todos">Todos</option>
+                            <option value="1">Normal</option>
+                            <option value="2">Anormal</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Audição (Dir.):</label>
+                        <select id="hear-right-filter">
+                            <option value="Todos">Todos</option>
+                            <option value="1">Normal</option>
+                            <option value="2">Anormal</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Pressão Sist. (SBP):</label>
+                        <div class="input-group">
+                            <input type="number" id="min-sbp" placeholder="Min">
+                            <input type="number" id="max-sbp" placeholder="Max">
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="chart-area">
+                <div class="chart-container">
+                    <canvas id="myChart"></canvas>
+                </div>
+            </main>
+
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>

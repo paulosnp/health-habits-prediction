@@ -1,0 +1,137 @@
+/* style.css (Versão com Layout de Sidebar) */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+:root {
+    --primary-color: #1a237e;
+    --light-gray: #f0f2f5;
+    --border-color: #e0e0e0;
+    --white-color: #ffffff;
+    --text-color: #333;
+    --label-color: #555;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--light-gray);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+}
+
+.dashboard-container {
+    width: 100%;
+    max-width: 1400px; /* Aumentamos a largura máxima para o novo layout */
+    margin: 0 auto;
+    background-color: var(--white-color);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+header {
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    margin: 0;
+    color: var(--primary-color);
+}
+
+/* --- Novo Layout Principal --- */
+.dashboard-content {
+    display: flex;
+    gap: 30px;
+}
+
+/* --- Barra Lateral de Filtros --- */
+.filter-sidebar {
+    flex: 0 0 280px; /* Não cresce, não encolhe, base de 280px */
+    border-right: 1px solid var(--border-color);
+    padding-right: 20px;
+}
+
+.filter-sidebar h2 {
+    margin-top: 0;
+    color: var(--primary-color);
+    font-size: 1.2em;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column; /* Filtros um abaixo do outro */
+    gap: 20px; /* Espaçamento entre os grupos de filtro */
+}
+
+.control-group label {
+    font-size: 0.9em;
+    margin-bottom: 8px;
+    color: var(--label-color);
+    font-weight: bold;
+}
+
+.control-group select,
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    box-sizing: border-box; /* Garante que padding não afete a largura total */
+}
+
+.control-group select {
+    cursor: pointer;
+}
+
+.input-group {
+    display: flex;
+    gap: 8px;
+}
+
+.control-group select:focus,
+.input-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.2);
+}
+
+/* --- Área do Gráfico --- */
+.chart-area {
+    flex: 1; /* Ocupa todo o espaço restante */
+    min-width: 0; /* Correção importante para flexbox */
+}
+
+.chart-container {
+    width: 100%;
+    height: auto;
+}
+
+/* --- Responsividade para Telas Menores --- */
+@media (max-width: 992px) {
+    .dashboard-content {
+        flex-direction: column; /* Volta para o layout de uma coluna */
+    }
+
+    .filter-sidebar {
+        flex-basis: auto; /* Reseta a largura da sidebar */
+        width: 100%;
+        border-right: none; /* Remove a borda lateral */
+        padding-right: 0;
+        margin-bottom: 30px;
+    }
+}
+
+/* Remove as setas de incremento/decremento dos inputs de número */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number] {
+    -moz-appearance: textfield;
+}
