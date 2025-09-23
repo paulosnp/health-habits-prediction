@@ -29,11 +29,11 @@ Para visualizar este projeto localmente, siga os passos abaixo:
     ```
 
 3.  **Baixe a base de dados (JSON):**
-    O arquivo de dados principal não está incluído no repositório por ser muito grande. Você precisa baixá-lo separadamente e colocá-lo na pasta raiz do projeto.
+    O arquivo de dados principal não está incluído no repositório. Use o link abaixo para fazer o download direto e coloque o arquivo na pasta raiz do projeto.
 
-    * **➡️ Link para download:** **[Clique aqui para baixar do Kaggle](https://www.kaggle.com/datasets/sooyoungher/smoking-drinking-dataset)**
+    * **➡️ Link para download direto:** **[Clique aqui para baixar o arquivo JSON](https://drive.google.com/uc?export=download&id=COLE_O_ID_DO_ARQUIVO_AQUI)**
 
-    * Após baixar e extrair, renomeie o arquivo CSV para **`[COLOQUE O NOME DO SEU ARQUIVO JSON AQUI]`** ou ajuste o nome do arquivo no código JavaScript para corresponder ao nome do arquivo baixado.
+    * **Importante:** Após o download, verifique se o nome do arquivo corresponde ao nome esperado no código JavaScript ou renomeie o arquivo conforme necessário.
 
 4.  **Abra o projeto:**
     Abra o arquivo `index.html` no seu navegador de preferência.
