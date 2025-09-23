@@ -31,7 +31,7 @@ Para visualizar este projeto localmente, siga os passos abaixo:
 3.  **Baixe a base de dados (JSON):**
     O arquivo de dados principal não está incluído no repositório. Use o link abaixo para fazer o download direto e coloque o arquivo na pasta raiz do projeto.
 
-    * **➡️ Link para download direto:** **[Clique aqui para baixar o arquivo JSON](https://drive.google.com/uc?export=download&id=COLE_O_ID_DO_ARQUIVO_AQUI)**
+    * **➡️ Link para download direto:** **[Clique aqui para baixar o arquivo JSON](https://drive.google.com/file/d/15GDdq2xXjxfM3UXDD92fzTz9MtuIGLhY/view?usp=sharing)**
 
     * **Importante:** Após o download, verifique se o nome do arquivo corresponde ao nome esperado no código JavaScript ou renomeie o arquivo conforme necessário.
 
