@@ -50,4 +50,4 @@ Para visualizar este projeto localmente, siga os passos abaixo:
 
 ## ✍️ Autor
 
-Feito com ❤️ por **[Paulo](https://github.com/paulosnp)**,**[Henrique Fernandes](https://github.com/Henriqueue)**,**[João Pedro](https://github.com/jppontesdev)**.
+Feito com ❤️ por **[Paulo](https://github.com/paulosnp)**, **[Henrique Fernandes](https://github.com/Henriqueue)** e **[João Pedro](https://github.com/jppontesdev)**.
