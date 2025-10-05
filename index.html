@@ -3,22 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Saúde v2</title>
+    <title>Bases de Dados</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="shortcut icon" href="smoking.png" type="image/x-icon">
 </head>
 <body>
+    <div class="overlay"></div>
 
     <div class="dashboard-container">
         <header>
-            <h1>Análise de Saúde Completa</h1>
-            <p>Explore os dados de saúde com filtros dinâmicos.</p>
+            <button class="hamburger-btn" id="hamburger-btn" aria-label="Abrir filtros">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <div class="header-content">
+                <h1>Dados sobre Tabagismo e Consumo de Álcool</h1>
+                <p>Preveja fumantes e bebedores usando dados de sinais corporais.</p>
+            </div>
         </header>
 
         <div class="dashboard-content">
 
-            <aside class="filter-sidebar">
-                <h2>Filtros</h2>
+            <aside class="filter-sidebar sidebar-closed">
+                <div class="sidebar-header">
+                    <h2>Filtros</h2>
+                    <button class="close-btn" id="close-sidebar-btn" aria-label="Fechar filtros">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
                 <div class="controls">
                     <div class="control-group">
                         <label for="gender-filter">Gênero:</label>

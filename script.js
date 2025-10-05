@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const minSbpInput = document.getElementById('min-sbp');
     const maxSbpInput = document.getElementById('max-sbp');
     
-    // ** NOVOS ELEMENTOS **
     const minWaistlineInput = document.getElementById('min-waistline');
     const maxWaistlineInput = document.getElementById('max-waistline');
     const minSightLeftInput = document.getElementById('min-sight-left');
@@ -26,6 +25,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const hearRightFilter = document.getElementById('hear-right-filter');
 
     const ctx = document.getElementById('myChart').getContext('2d');
+    const chartContainer = document.querySelector('.chart-container'); // NOVO: Pega o container do gráfico
+
+    // --- NOVO: Lógica para controlar o menu lateral ---
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+    const sidebar = document.querySelector('.filter-sidebar');
+    const overlay = document.querySelector('.overlay');
+
+    function openSidebar() {
+        sidebar.classList.remove('sidebar-closed');
+        overlay.classList.add('active');
+    }
+
+    function closeSidebar() {
+        sidebar.classList.add('sidebar-closed');
+        overlay.classList.remove('active');
+    }
+
+    hamburgerBtn.addEventListener('click', openSidebar);
+    closeSidebarBtn.addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebar);
+    // --- FIM DA NOVA LÓGICA ---
+
 
     async function loadData() {
         try {
@@ -44,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- 1. Lê o valor de TODOS os filtros ---
         const selectedGender = genderFilter.value;
         const chartType = chartTypeSelector.value;
-
         const minAge = parseFloat(minAgeInput.value);
         const maxAge = parseFloat(maxAgeInput.value);
         const minHeight = parseFloat(minHeightInput.value);
@@ -53,8 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const maxWeight = parseFloat(maxWeightInput.value);
         const minSbp = parseFloat(minSbpInput.value);
         const maxSbp = parseFloat(maxSbpInput.value);
-        
-        // ** NOVOS VALORES **
         const minWaistline = parseFloat(minWaistlineInput.value);
         const maxWaistline = parseFloat(maxWaistlineInput.value);
         const minSightLeft = parseFloat(minSightLeftInput.value);
@@ -64,6 +83,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedHearLeft = hearLeftFilter.value;
         const selectedHearRight = hearRightFilter.value;
 
+        // --- NOVO: Adiciona/remove classe para ajustar o tamanho do gráfico ---
+        if (chartType === 'pie' || chartType === 'doughnut') {
+            chartContainer.classList.add('small-chart');
+        } else {
+            chartContainer.classList.remove('small-chart');
+        }
+
         // --- 2. Filtra os dados em CADEIA ---
         const filteredData = fullData.filter(person => {
             const passesGender = selectedGender === 'Todos' || person.sex === selectedGender;
@@ -71,12 +97,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const passesHeight = (isNaN(minHeight) || person.height_cm >= minHeight) && (isNaN(maxHeight) || person.height_cm <= maxHeight);
             const passesWeight = (isNaN(minWeight) || person.weight_kg >= minWeight) && (isNaN(maxWeight) || person.weight_kg <= maxWeight);
             const passesSbp = (isNaN(minSbp) || person.SBP >= minSbp) && (isNaN(maxSbp) || person.SBP <= maxSbp);
-
-            // ** NOVAS CONDIÇÕES DE FILTRO **
             const passesWaistline = (isNaN(minWaistline) || person.waistline_cm >= minWaistline) && (isNaN(maxWaistline) || person.waistline_cm <= maxWaistline);
             const passesSightLeft = (isNaN(minSightLeft) || person.sight_left >= minSightLeft) && (isNaN(maxSightLeft) || person.sight_left <= maxSightLeft);
             const passesSightRight = (isNaN(minSightRight) || person.sight_right >= minSightRight) && (isNaN(maxSightRight) || person.sight_right <= maxSightRight);
-            // Usamos '==' para audição porque o JSON tem número (1.0) e o select tem texto ("1")
             const passesHearLeft = selectedHearLeft === 'Todos' || person.hear_left == selectedHearLeft;
             const passesHearRight = selectedHearRight === 'Todos' || person.hear_right == selectedHearRight;
 
@@ -93,8 +116,8 @@ document.addEventListener('DOMContentLoaded', () => {
             datasets: [{
                 label: `Total de Pessoas: ${filteredData.length}`,
                 data: [smokerCount, nonSmokerCount],
-                backgroundColor: ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)'],
-                borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)'],
+                backgroundColor: ['#8C1007', '#6E9234'],
+                borderColor: ['#3E0703', '#3E591E'],
                 borderWidth: 1
             }]
         };
@@ -111,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const allFilters = [
         genderFilter, chartTypeSelector, minAgeInput, maxAgeInput, minHeightInput, maxHeightInput,
         minWeightInput, maxWeightInput, minSbpInput, maxSbpInput, 
-        // ** NOVOS LISTENERS **
         minWaistlineInput, maxWaistlineInput, minSightLeftInput, maxSightLeftInput,
         minSightRightInput, maxSightRightInput, hearLeftFilter, hearRightFilter
     ];

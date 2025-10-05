@@ -1,109 +1,162 @@
-/* style.css (Versão com Layout de Sidebar) */
+/* style.css (Versão Dark Mode com Menu Lateral) */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 :root {
-    --primary-color: #1a237e;
-    --light-gray: #f0f2f5;
-    --border-color: #e0e0e0;
-    --white-color: #ffffff;
-    --text-color: #333;
-    --label-color: #555;
+    --primary-color: #ffffff;
+    --background-dark: #1f2023;
+    --container-dark: #2a2c30;
+    --border-color: #444;
+    --text-color: #e0e0e0;
+    --label-color: #b0b0b0;
+    --input-bg-color: #33353a;
 }
 
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: var(--light-gray);
+    background-color: var(--background-dark);
     color: var(--text-color);
     margin: 0;
     padding: 20px;
+    position: relative; /* NOVO: Necessário para o posicionamento do menu */
+    overflow-x: hidden; /* NOVO: Previne scroll horizontal causado pelo menu escondido */
+}
+
+/* --- NOVO: Estilos para o Overlay --- */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+.overlay.active {
+    opacity: 1;
+    pointer-events: all;
 }
 
 .dashboard-container {
     width: 100%;
-    max-width: 1400px; /* Aumentamos a largura máxima para o novo layout */
+    max-width: 1400px;
     margin: 0 auto;
-    background-color: var(--white-color);
+    background-color: var(--container-dark);
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 header {
-    text-align: center;
+    display: flex; /* NOVO */
+    align-items: center; /* NOVO */
+    gap: 20px; /* NOVO */
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 20px;
     margin-bottom: 20px;
 }
 
-header h1 {
+/* NOVO: Estilo para o botão hambúrguer */
+.hamburger-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 5px;
+}
+.hamburger-btn svg {
+    width: 28px;
+    height: 28px;
+    stroke: var(--primary-color);
+}
+.header-content {
+    text-align: center;
+    flex-grow: 1; /* Faz o texto ocupar o espaço restante */
+}
+.header-content h1, .header-content p {
     margin: 0;
+}
+h1 {
     color: var(--primary-color);
 }
 
-/* --- Novo Layout Principal --- */
+/* --- Layout Principal --- */
 .dashboard-content {
     display: flex;
-    gap: 30px;
 }
 
-/* --- Barra Lateral de Filtros --- */
+/* --- Barra Lateral de Filtros (MODIFICADO) --- */
 .filter-sidebar {
-    flex: 0 0 280px; /* Não cresce, não encolhe, base de 280px */
-    border-right: 1px solid var(--border-color);
-    padding-right: 20px;
+    position: fixed; /* NOVO: Fica por cima do conteúdo */
+    top: 0;
+    left: 0;
+    width: 300px; /* Largura do menu */
+    height: 100vh; /* Altura total da tela */
+    background-color: var(--container-dark);
+    z-index: 1000; /* Fica acima do overlay */
+    padding: 20px;
+    box-shadow: 4px 0px 15px rgba(0,0,0,0.5);
+    overflow-y: auto; /* Permite rolar se os filtros forem muitos */
+    
+    transform: translateX(-100%); /* NOVO: Começa escondido à esquerda */
+    transition: transform 0.3s ease-in-out; /* NOVO: Animação de deslize */
+}
+.filter-sidebar:not(.sidebar-closed) { /* Regra para quando estiver aberto */
+    transform: translateX(0);
 }
 
-.filter-sidebar h2 {
+/* NOVO: Cabeçalho do menu lateral */
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+.sidebar-header h2 {
     margin-top: 0;
     color: var(--primary-color);
     font-size: 1.2em;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border: none;
+}
+
+/* NOVO: Botão de fechar do menu */
+.close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+.close-btn svg {
+    width: 24px;
+    height: 24px;
+    stroke: var(--label-color);
+}
+.close-btn:hover svg {
+    stroke: var(--primary-color);
 }
 
 .controls {
     display: flex;
-    flex-direction: column; /* Filtros um abaixo do outro */
-    gap: 20px; /* Espaçamento entre os grupos de filtro */
+    flex-direction: column;
+    gap: 20px;
 }
 
-.control-group label {
-    font-size: 0.9em;
-    margin-bottom: 8px;
-    color: var(--label-color);
-    font-weight: bold;
-}
+.control-group label { font-size: 0.9em; margin-bottom: 8px; color: var(--label-color); font-weight: bold; }
+.control-group select, .input-group input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 1em; box-sizing: border-box; background-color: var(--input-bg-color); color: var(--text-color); }
+.control-group select { cursor: pointer; }
+.input-group { display: flex; gap: 8px; }
+.control-group select:focus, .input-group input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(61, 132, 230, 0.25); }
 
-.control-group select,
-.input-group input {
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 1em;
-    box-sizing: border-box; /* Garante que padding não afete a largura total */
-}
 
-.control-group select {
-    cursor: pointer;
-}
-
-.input-group {
-    display: flex;
-    gap: 8px;
-}
-
-.control-group select:focus,
-.input-group input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.2);
-}
-
-/* --- Área do Gráfico --- */
+/* --- Área do Gráfico (MODIFICADO) --- */
 .chart-area {
-    flex: 1; /* Ocupa todo o espaço restante */
-    min-width: 0; /* Correção importante para flexbox */
+    flex: 1; /* Ocupa todo o espaço disponível agora */
+    min-width: 0;
 }
 
 .chart-container {
@@ -111,22 +164,27 @@ header h1 {
     height: auto;
 }
 
-/* --- Responsividade para Telas Menores --- */
-@media (max-width: 992px) {
-    .dashboard-content {
-        flex-direction: column; /* Volta para o layout de uma coluna */
-    }
+/* NOVO: Classe para diminuir o tamanho dos gráficos de pizza/rosca */
+.chart-container.small-chart {
+    max-width: 70%;
+    margin: 0 auto; /* Para centralizar o container menor */
+}
 
-    .filter-sidebar {
-        flex-basis: auto; /* Reseta a largura da sidebar */
-        width: 100%;
-        border-right: none; /* Remove a borda lateral */
-        padding-right: 0;
-        margin-bottom: 30px;
+/* --- Responsividade (REMOVIDO o antigo, pois o menu já resolve isso) --- */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    .dashboard-container {
+        padding: 15px;
+    }
+    header {
+        flex-direction: column;
+        gap: 15px;
     }
 }
 
-/* Remove as setas de incremento/decremento dos inputs de número */
+/* ... (regras para remover setas do input number permanecem iguais) ... */
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
