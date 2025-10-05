@@ -2,51 +2,48 @@
 
 Este projeto é uma aplicação web interativa para visualizar e analisar dados sobre hábitos de saúde, especificamente tabagismo e consumo de álcool, com base em diversos sinais corporais.
 
-> 🚧 Projeto em Desenvolvimento 🚧
+**🔗 ACESSO DIRETO:** Você pode visualizar o projeto online através do GitHub Pages:
+[**https://paulosnp.github.io/health-habits-prediction/**](https://paulosnp.github.io/health-habits-prediction/)
 
----
+> 🚧 **Nota de Execução:** Os dados são carregados diretamente de um link externo (Cloudflare R2), tornando o projeto mais leve e fácil de executar.
+
+-----
 
 ## 🚀 Tecnologias Utilizadas
 
-![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)
-![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
+-----
 
----
+## 📋 Como Executar o Projeto Localmente
 
-## 📋 Como Executar o Projeto
-
-Para visualizar este projeto localmente, siga os passos abaixo:
+Para rodar este projeto no seu computador, siga os passos abaixo:
 
 1.  **Clone o repositório:**
+
     ```bash
     git clone [https://github.com/paulosnp/health-habits-prediction.git](https://github.com/paulosnp/health-habits-prediction.git)
     ```
 
 2.  **Navegue até a pasta do projeto:**
+
     ```bash
     cd health-habits-prediction
     ```
 
-3.  **Baixe a base de dados (JSON):**
-    O arquivo de dados principal não está incluído no repositório. Use o link abaixo para fazer o download direto e coloque o arquivo na pasta raiz do projeto.
-
-    * **➡️ Link para download direto:** **<a href="https://github.com/paulosnp/health-habits-prediction/releases/download/data/smoking_drinking_data.json" target="_blank" rel="noopener noreferrer">Clique aqui para baixar o arquivo JSON</a>**
-    * **Importante:** Após o download, verifique se o nome do arquivo corresponde ao nome esperado no código JavaScript ou renomeie o arquivo conforme necessário.
-
-4.  **Abra o projeto:**
+3.  **Abra o projeto:**
     Abra o arquivo `index.html` no seu navegador de preferência.
 
----
+> 💡 **Não é necessário baixar o arquivo de dados separadamente.** O script (`script.js`) busca o CSV automaticamente de um link externo para garantir a performance e a execução imediata.
+
+-----
 
 ## ✨ Funcionalidades
 
-* [ ] Visualização de dados em gráficos interativos (Barras, Pizza, etc.).
-* [ ] Filtros dinâmicos para explorar diferentes segmentos da base de dados (idade, sexo, etc.).
-* [ ] Exibição de estatísticas chave sobre a correlação entre sinais corporais e hábitos.
-* [ ] Interface limpa e responsiva para fácil navegação.
+  * **Visualização de dados** em gráficos interativos (Barras, Pizza, etc.).
+  * **Filtros dinâmicos** para explorar diferentes segmentos da base de dados (idade, sexo, etc.).
+  * Exibição de estatísticas chave sobre a correlação entre sinais corporais e hábitos.
+  * Interface limpa e responsiva para fácil navegação.
 
----
+-----
 
 ## ✍️ Autor
 
