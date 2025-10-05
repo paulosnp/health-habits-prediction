@@ -17,11 +17,11 @@ body {
     color: var(--text-color);
     margin: 0;
     padding: 20px;
-    position: relative; /* NOVO: Necessário para o posicionamento do menu */
-    overflow-x: hidden; /* NOVO: Previne scroll horizontal causado pelo menu escondido */
+    position: relative;
+    overflow-x: hidden;
 }
 
-/* --- NOVO: Estilos para o Overlay --- */
+/* --- Estilos para o Overlay --- */
 .overlay {
     position: fixed;
     top: 0;
@@ -50,15 +50,15 @@ body {
 }
 
 header {
-    display: flex; /* NOVO */
-    align-items: center; /* NOVO */
-    gap: 20px; /* NOVO */
+    display: flex;
+    align-items: center;
+    gap: 20px;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 20px;
     margin-bottom: 20px;
 }
 
-/* NOVO: Estilo para o botão hambúrguer */
+/* Estilo para o botão hambúrguer */
 .hamburger-btn {
     background: none;
     border: none;
@@ -73,7 +73,7 @@ header {
 }
 .header-content {
     text-align: center;
-    flex-grow: 1; /* Faz o texto ocupar o espaço restante */
+    flex-grow: 1;
 }
 .header-content h1, .header-content p {
     margin: 0;
@@ -87,45 +87,52 @@ h1 {
     display: flex;
 }
 
-/* --- Barra Lateral de Filtros (MODIFICADO) --- */
+/* ======================================================= */
+/* === ÁREA MODIFICADA 1: Barra Lateral de Filtros === */
+/* ======================================================= */
 .filter-sidebar {
-    position: fixed; /* NOVO: Fica por cima do conteúdo */
+    position: fixed;
     top: 0;
     left: 0;
-    width: 300px; /* Largura do menu */
+    width: 300px;
     height: 100vh; /* Altura total da tela */
     background-color: var(--container-dark);
-    z-index: 1000; /* Fica acima do overlay */
+    z-index: 1000;
     padding: 20px;
     box-shadow: 4px 0px 15px rgba(0,0,0,0.5);
-    overflow-y: auto; /* Permite rolar se os filtros forem muitos */
     
-    transform: translateX(-100%); /* NOVO: Começa escondido à esquerda */
-    transition: transform 0.3s ease-in-out; /* NOVO: Animação de deslize */
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+
+    /* PROPRIEDADES ADICIONADAS/ALTERADAS */
+    box-sizing: border-box; /* Garante que o padding não aumente a altura total */
+    display: flex;          /* Ativa o layout flexbox */
+    flex-direction: column; /* Organiza os itens internos em uma coluna */
+    gap: 20px;              /* Adiciona espaço entre o cabeçalho e a área de filtros */
+    /* A propriedade 'overflow-y' foi removida daqui */
 }
-.filter-sidebar:not(.sidebar-closed) { /* Regra para quando estiver aberto */
+.filter-sidebar:not(.sidebar-closed) {
     transform: translateX(0);
 }
 
-/* NOVO: Cabeçalho do menu lateral */
+/* Cabeçalho do menu lateral */
 .sidebar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 10px;
-    margin-bottom: 20px;
+    /* margin-bottom foi removido para usarmos 'gap' no elemento pai */
 }
 .sidebar-header h2 {
-    margin-top: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
     color: var(--primary-color);
     font-size: 1.2em;
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border: none;
 }
 
-/* NOVO: Botão de fechar do menu */
+/* Botão de fechar do menu */
 .close-btn {
     background: none;
     border: none;
@@ -140,10 +147,19 @@ h1 {
     stroke: var(--primary-color);
 }
 
+/* ======================================================= */
+/* === ÁREA MODIFICADA 2: Área de Controles dos Filtros === */
+/* ======================================================= */
 .controls {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    
+    /* PROPRIEDADES ADICIONADAS */
+    flex: 1;             /* Faz esta área ocupar todo o espaço vertical restante */
+    overflow-y: auto;    /* Adiciona a barra de rolagem APENAS AQUI quando necessário */
+    min-height: 0;       /* Melhora o cálculo de altura em layouts flex */
+    padding-right: 10px; /* Adiciona um espaço para a barra de rolagem não cobrir os inputs */
 }
 
 .control-group label { font-size: 0.9em; margin-bottom: 8px; color: var(--label-color); font-weight: bold; }
@@ -153,9 +169,9 @@ h1 {
 .control-group select:focus, .input-group input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(61, 132, 230, 0.25); }
 
 
-/* --- Área do Gráfico (MODIFICADO) --- */
+/* --- Área do Gráfico --- */
 .chart-area {
-    flex: 1; /* Ocupa todo o espaço disponível agora */
+    flex: 1;
     min-width: 0;
 }
 
@@ -164,13 +180,12 @@ h1 {
     height: auto;
 }
 
-/* NOVO: Classe para diminuir o tamanho dos gráficos de pizza/rosca */
 .chart-container.small-chart {
     max-width: 70%;
-    margin: 0 auto; /* Para centralizar o container menor */
+    margin: 0 auto;
 }
 
-/* --- Responsividade (REMOVIDO o antigo, pois o menu já resolve isso) --- */
+/* --- Responsividade --- */
 @media (max-width: 768px) {
     body {
         padding: 10px;
@@ -197,24 +212,23 @@ input[type=number] {
 /* --- ESTILOS DO ÍCONE DE CARREGAMENTO (SPINNER) ADICIONADOS --- */
 .loader-container {
     display: flex;
-    flex-direction: column; /* Para alinhar o spinner e o texto verticalmente */
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 400px; /* Defina uma altura para centralizar bem */
-    gap: 15px; /* Espaço entre o spinner e o texto */
+    height: 400px;
+    gap: 15px;
 }
 
 .loader-spinner {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    border: 5px solid var(--border-color); /* Cor da borda "inativa" */
-    border-top-color: var(--primary-color); /* Cor da parte que "gira" */
+    border: 5px solid var(--border-color);
+    border-top-color: var(--primary-color);
     animation: spin 1s linear infinite;
 }
 
-/* Animação de rotação */
 @keyframes spin {
     to {
         transform: rotate(360deg);

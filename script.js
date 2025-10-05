@@ -1,11 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Registra o plugin de rótulos para que ele funcione
+    // Registra o plugin de rótulos
     Chart.register(ChartDataLabels);
 
     let myChart = null;
     let fullData = [];
 
     // --- Pega todos os elementos do HTML ---
+    const metricSelector = document.getElementById('metric-selector');
     const genderFilter = document.getElementById('gender-filter');
     const chartTypeSelector = document.getElementById('chart-type-selector');
     const minAgeInput = document.getElementById('min-age');
@@ -44,34 +45,25 @@ document.addEventListener('DOMContentLoaded', () => {
     closeSidebarBtn.addEventListener('click', closeSidebar);
     overlay.addEventListener('click', closeSidebar);
     
-    // --- Carregamento de dados via CSV do Cloudflare R2 ---
+    // --- Carregamento de dados via CSV ---
     async function loadData() {
         const loader = document.getElementById('loader');
         loader.style.display = 'flex';
         chartContainer.style.display = 'none';
 
-        // !!! IMPORTANTE: Cole aqui a URL pública do seu arquivo CSV no Cloudflare R2
         const csvUrl = 'https://pub-30aea22574314423a80babb2f0c54df3.r2.dev/smoking_driking_dataset_Ver01.csv';
 
         try {
             const response = await fetch(csvUrl);
-            if (!response.ok) {
-                throw new Error(`Erro ao buscar o arquivo CSV: ${response.statusText}`);
-            }
+            if (!response.ok) throw new Error(`Erro ao buscar o arquivo CSV: ${response.statusText}`);
+            
             const csvText = await response.text();
-
             const jsonData = await new Promise((resolve, reject) => {
                 Papa.parse(csvText, {
                     header: true,
                     dynamicTyping: true,
                     skipEmptyLines: true,
-                    complete: (results) => {
-                        if (results.errors.length) {
-                            reject(new Error(results.errors[0].message));
-                        } else {
-                            resolve(results.data);
-                        }
-                    },
+                    complete: (results) => results.errors.length ? reject(new Error(results.errors[0].message)) : resolve(results.data),
                     error: (error) => reject(error)
                 });
             });
@@ -92,7 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateChart() {
+        // --- Leitura dos valores dos filtros ---
         const chartType = chartTypeSelector.value;
+        const selectedMetric = metricSelector.value;
         const selectedGender = genderFilter.value;
         const minAge = parseFloat(minAgeInput.value);
         const maxAge = parseFloat(maxAgeInput.value);
@@ -111,12 +105,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedHearLeft = hearLeftFilter.value;
         const selectedHearRight = hearRightFilter.value;
 
+        // Ajusta o tamanho do container para gráficos de pizza/rosca
         if (chartType === 'pie' || chartType === 'doughnut') {
             chartContainer.classList.add('small-chart');
         } else {
             chartContainer.classList.remove('small-chart');
         }
         
+        // --- Filtragem dos dados com base nos inputs ---
         const filteredData = fullData.filter(person => {
             const passesGender = selectedGender === 'Todos' || person.sex === selectedGender;
             const passesAge = (isNaN(minAge) || person.age >= minAge) && (isNaN(maxAge) || person.age <= maxAge);
@@ -131,20 +127,42 @@ document.addEventListener('DOMContentLoaded', () => {
             return passesGender && passesAge && passesHeight && passesWeight && passesSbp && passesWaistline && passesSightLeft && passesSightRight && passesHearLeft && passesHearRight;
         });
 
-        const smokerCount = filteredData.filter(p => p.SMK_stat_type_cd === 1).length;
-        const nonSmokerCount = filteredData.filter(p => p.SMK_stat_type_cd !== 1).length;
+        // --- Preparação dos dados para o gráfico ---
+        let labels, data, backgroundColors, borderColors, chartTitle;
+
+        if (selectedMetric === 'smokers') {
+            const smokerCount = filteredData.filter(p => p.SMK_stat_type_cd === 1).length;
+            const nonSmokerCount = filteredData.length - smokerCount;
+            
+            labels = ['Fumantes', 'Não Fumantes'];
+            data = [smokerCount, nonSmokerCount];
+            backgroundColors = ['#8C1007', '#6E9234'];
+            borderColors = ['#3E0703', '#3E591E'];
+            chartTitle = 'Distribuição de Fumantes (Com base nos filtros aplicados)';
+
+        } else if (selectedMetric === 'drinkers') {
+            const drinkerCount = filteredData.filter(p => p.DRK_YN === 'Y').length;
+            const nonDrinkerCount = filteredData.length - drinkerCount;
+            
+            labels = ['Alcoólatras', 'Não Alcoólatras'];
+            data = [drinkerCount, nonDrinkerCount];
+            backgroundColors = ['#0A4F8A', '#F7B801'];
+            borderColors = ['#052A4A', '#C08F00'];
+            chartTitle = 'Distribuição de Alcoólatras (Com base nos filtros aplicados)';
+        }
 
         const chartData = {
-            labels: ['Fumantes', 'Não Fumantes'],
+            labels: labels,
             datasets: [{
                 label: 'População', 
-                data: [smokerCount, nonSmokerCount],
-                backgroundColor: ['#8C1007', '#6E9234'],
-                borderColor: ['#3E0703', '#3E591E'],
+                data: data,
+                backgroundColor: backgroundColors,
+                borderColor: borderColors,
                 borderWidth: 1
             }]
         };
 
+        // --- Renderização do gráfico ---
         if (myChart) { myChart.destroy(); }
         
         myChart = new Chart(ctx, {
@@ -155,10 +173,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 plugins: {
                     title: { 
                         display: true, 
-                        text: 'Distribuição de Fumantes (Com base nos filtros aplicados)',
+                        text: chartTitle,
                         color: '#ffffff'
                     },
                     legend: {
+                        onClick: (e, legendItem, legend) => {
+                            Chart.defaults.plugins.legend.onClick.call(this, e, legendItem, legend);
+                            legend.chart.update();
+                        },
                         labels: {
                             generateLabels: function(chart) {
                                 const data = chart.data;
@@ -169,33 +191,23 @@ document.addEventListener('DOMContentLoaded', () => {
                                     lineWidth: data.datasets[0].borderWidth,
                                     hidden: !chart.getDataVisibility(i),
                                     index: i,
-                                    fontColor: '#ffffff' 
+                                    // ===============================================
+                                    // A CORREÇÃO DEFINITIVA ESTÁ NESTA LINHA:
+                                    fontColor: '#ffffff'
+                                    // ===============================================
                                 }));
                             }
-                        },
-                        onClick: function(e, legendItem, legend) {
-                            Chart.defaults.plugins.legend.onClick.call(this, e, legendItem, legend);
-                            legend.chart.update();
                         }
                     },
                     tooltip: {
                         backgroundColor: '#1a1a1a',
+                        titleColor: '#ffffff',
+                        bodyColor: '#e0e0e0',
+                        footerColor: '#b0b0b0',
                         callbacks: {
                             label: function(context) {
-                                const chart = context.chart;
                                 const value = context.raw;
-                                const datapoints = chart.data.datasets[0].data;
-                                let total;
-                                if (chart.config.type === 'pie' || chart.config.type === 'doughnut') {
-                                    total = 0;
-                                    for (let i = 0; i < datapoints.length; i++) {
-                                        if (chart.getDataVisibility(i)) {
-                                            total += datapoints[i];
-                                        }
-                                    }
-                                } else {
-                                    total = datapoints.reduce((a, b) => a + b, 0);
-                                }
+                                const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                                 const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
                                 return ` Pessoas: ${value} (${percentage}%)`;
                             },
@@ -207,19 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     datalabels: {
                         formatter: (value, context) => {
-                            const chart = context.chart;
-                            const datapoints = chart.data.datasets[0].data;
-                            let total;
-                            if (chart.config.type === 'pie' || chart.config.type === 'doughnut') {
-                                total = 0;
-                                for (let i = 0; i < datapoints.length; i++) {
-                                    if (chart.getDataVisibility(i)) {
-                                        total += datapoints[i];
-                                    }
-                                }
-                            } else {
-                                total = datapoints.reduce((a, b) => a + b, 0);
-                            }
+                            const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                             if (total === 0) return '';
                             const percentage = (value / total) * 100;
                             if (percentage < 3) return '';
@@ -236,8 +236,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Adiciona os event listeners para todos os filtros ---
     const allFilters = [
-        genderFilter, chartTypeSelector, minAgeInput, maxAgeInput, minHeightInput, maxHeightInput,
+        genderFilter, chartTypeSelector, metricSelector,
+        minAgeInput, maxAgeInput, minHeightInput, maxHeightInput,
         minWeightInput, maxWeightInput, minSbpInput, maxSbpInput,
         minWaistlineInput, maxWaistlineInput, minSightLeftInput, maxSightLeftInput,
         minSightRightInput, maxSightRightInput, hearLeftFilter, hearRightFilter
@@ -248,5 +250,6 @@ document.addEventListener('DOMContentLoaded', () => {
         filter.addEventListener(eventType, updateChart);
     });
 
+    // --- Inicia o carregamento dos dados ---
     loadData();
 });
