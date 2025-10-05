@@ -193,3 +193,30 @@ input[type=number]::-webkit-outer-spin-button {
 input[type=number] {
     -moz-appearance: textfield;
 }
+
+/* --- ESTILOS DO ÍCONE DE CARREGAMENTO (SPINNER) ADICIONADOS --- */
+.loader-container {
+    display: flex;
+    flex-direction: column; /* Para alinhar o spinner e o texto verticalmente */
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 400px; /* Defina uma altura para centralizar bem */
+    gap: 15px; /* Espaço entre o spinner e o texto */
+}
+
+.loader-spinner {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 5px solid var(--border-color); /* Cor da borda "inativa" */
+    border-top-color: var(--primary-color); /* Cor da parte que "gira" */
+    animation: spin 1s linear infinite;
+}
+
+/* Animação de rotação */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

@@ -1,11 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Registra o plugin de rótulos
+    Chart.register(ChartDataLabels);
+
     let myChart = null;
     let fullData = [];
 
-    // --- Pega TODOS os elementos de filtro do HTML ---
+    // --- Pega todos os elementos ---
     const genderFilter = document.getElementById('gender-filter');
     const chartTypeSelector = document.getElementById('chart-type-selector');
-    
     const minAgeInput = document.getElementById('min-age');
     const maxAgeInput = document.getElementById('max-age');
     const minHeightInput = document.getElementById('min-height');
@@ -14,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const maxWeightInput = document.getElementById('max-weight');
     const minSbpInput = document.getElementById('min-sbp');
     const maxSbpInput = document.getElementById('max-sbp');
-    
     const minWaistlineInput = document.getElementById('min-waistline');
     const maxWaistlineInput = document.getElementById('max-waistline');
     const minSightLeftInput = document.getElementById('min-sight-left');
@@ -23,76 +24,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const maxSightRightInput = document.getElementById('max-sight-right');
     const hearLeftFilter = document.getElementById('hear-left-filter');
     const hearRightFilter = document.getElementById('hear-right-filter');
-
     const ctx = document.getElementById('myChart').getContext('2d');
     const chartContainer = document.querySelector('.chart-container');
-
-    // --- Lógica para controlar o menu lateral ---
     const hamburgerBtn = document.getElementById('hamburger-btn');
     const closeSidebarBtn = document.getElementById('close-sidebar-btn');
     const sidebar = document.querySelector('.filter-sidebar');
     const overlay = document.querySelector('.overlay');
 
+    // --- Lógica do menu lateral ---
     function openSidebar() {
         sidebar.classList.remove('sidebar-closed');
         overlay.classList.add('active');
     }
-
     function closeSidebar() {
         sidebar.classList.add('sidebar-closed');
         overlay.classList.remove('active');
     }
-
     hamburgerBtn.addEventListener('click', openSidebar);
     closeSidebarBtn.addEventListener('click', closeSidebar);
     overlay.addEventListener('click', closeSidebar);
     
-    // --- ✅ FUNÇÃO ALTERADA PARA LER CSV ---
+    // --- Carregamento de dados ---
     async function loadData() {
-        // IMPORTANTE: Coloque aqui a URL para o seu arquivo .csv no GitHub Releases
-        const urlExterna = 'https://pub-30aea22574314423a80babb2f0c54df3.r2.dev/smoking_driking_dataset_Ver01.csv';
-
-        // Mostra a mensagem de carregamento no canvas
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        ctx.font = "20px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText("Carregando dados, por favor aguarde...", ctx.canvas.width / 2, ctx.canvas.height / 2);
-
+        const loader = document.getElementById('loader');
+        loader.style.display = 'flex';
+        chartContainer.style.display = 'none';
         try {
-            console.log("1. Iniciando o fetch do arquivo CSV...");
-            const response = await fetch(urlExterna);
-            if (!response.ok) { throw new Error(`Erro HTTP! status: ${response.status}`); }
-
-            const csvText = await response.text();
-            console.log("2. CSV baixado, iniciando a interpretação (parse)...");
-
-            // Usa a biblioteca Papa Parse para converter o texto CSV
-            Papa.parse(csvText, {
-                header: true,
-                dynamicTyping: true,
-                skipEmptyLines: true,
-                complete: function(results) {
-                    console.log("3. Interpretação concluída! Dados prontos.");
-                    fullData = results.data;
-                    
-                    console.log("4. Chamando a função para atualizar o gráfico...");
-                    updateChart();
-                }
-            });
-
+            const response = await fetch('smoking_drinking_data.json');
+            if (!response.ok) throw new Error(`Erro HTTP! status: ${response.status}`);
+            fullData = await response.json();
+            updateChart();
         } catch (error) {
-            console.error("ERRO ao carregar ou interpretar o CSV:", error);
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            console.error("Não foi possível carregar os dados:", error);
             ctx.font = "16px Arial";
-            ctx.fillText("Falha ao carregar os dados. Verifique o console.", 10, 50);
+            ctx.fillStyle = "#e0e0e0";
+            ctx.textAlign = "center";
+            ctx.fillText("Falha ao carregar os dados. Verifique o console.", ctx.canvas.width / 2, 50);
+        } finally {
+            loader.style.display = 'none';
+            chartContainer.style.display = 'block';
         }
     }
 
-    // --- NENHUMA ALTERAÇÃO DAQUI PARA BAIXO ---
     function updateChart() {
-        // --- 1. Lê o valor de TODOS os filtros ---
-        const selectedGender = genderFilter.value;
+        // --- Leitura e filtragem dos dados ---
         const chartType = chartTypeSelector.value;
+        const selectedGender = genderFilter.value;
         const minAge = parseFloat(minAgeInput.value);
         const maxAge = parseFloat(maxAgeInput.value);
         const minHeight = parseFloat(minHeightInput.value);
@@ -115,8 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             chartContainer.classList.remove('small-chart');
         }
-
-        // --- 2. Filtra os dados em CADEIA ---
+        
         const filteredData = fullData.filter(person => {
             const passesGender = selectedGender === 'Todos' || person.sex === selectedGender;
             const passesAge = (isNaN(minAge) || person.age >= minAge) && (isNaN(maxAge) || person.age <= maxAge);
@@ -128,19 +104,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const passesSightRight = (isNaN(minSightRight) || person.sight_right >= minSightRight) && (isNaN(maxSightRight) || person.sight_right <= maxSightRight);
             const passesHearLeft = selectedHearLeft === 'Todos' || person.hear_left == selectedHearLeft;
             const passesHearRight = selectedHearRight === 'Todos' || person.hear_right == selectedHearRight;
-
-            return passesGender && passesAge && passesHeight && passesWeight && passesSbp && 
-                   passesWaistline && passesSightLeft && passesSightRight && passesHearLeft && passesHearRight;
+            return passesGender && passesAge && passesHeight && passesWeight && passesSbp && passesWaistline && passesSightLeft && passesSightRight && passesHearLeft && passesHearRight;
         });
 
-        // --- 3. Processa os dados para o gráfico ---
         const smokerCount = filteredData.filter(p => p.SMK_stat_type_cd === 1.0).length;
         const nonSmokerCount = filteredData.filter(p => p.SMK_stat_type_cd !== 1.0).length;
 
         const chartData = {
             labels: ['Fumantes', 'Não Fumantes'],
             datasets: [{
-                label: `Total de Pessoas: ${filteredData.length}`,
+                label: 'População', 
                 data: [smokerCount, nonSmokerCount],
                 backgroundColor: ['#8C1007', '#6E9234'],
                 borderColor: ['#3E0703', '#3E591E'],
@@ -148,18 +121,103 @@ document.addEventListener('DOMContentLoaded', () => {
             }]
         };
 
-        // --- 4. Destrói e Recria o gráfico ---
         if (myChart) { myChart.destroy(); }
+        
         myChart = new Chart(ctx, {
-            type: chartType, data: chartData,
-            options: { responsive: true, plugins: { title: { display: true, text: 'Distribuição de Fumantes (Com base nos filtros aplicados)' } } }
+            type: chartType, 
+            data: chartData,
+            options: {
+                responsive: true,
+                plugins: {
+                    title: { 
+                        display: true, 
+                        text: 'Distribuição de Fumantes (Com base nos filtros aplicados)',
+                        color: '#ffffff'
+                    },
+                    legend: {
+                        labels: {
+                            // A função generateLabels agora define a cor do texto diretamente
+                            generateLabels: function(chart) {
+                                const data = chart.data;
+                                return data.labels.map((label, i) => ({
+                                    text: label,
+                                    fillStyle: data.datasets[0].backgroundColor[i],
+                                    strokeStyle: data.datasets[0].borderColor[i],
+                                    lineWidth: data.datasets[0].borderWidth,
+                                    hidden: !chart.getDataVisibility(i),
+                                    index: i,
+                                    // *** COR DO TEXTO DA LEGENDA ADICIONADA AQUI ***
+                                    fontColor: '#ffffff' 
+                                }));
+                            }
+                        },
+                        onClick: function(e, legendItem, legend) {
+                            Chart.defaults.plugins.legend.onClick.call(this, e, legendItem, legend);
+                            legend.chart.update();
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#1a1a1a',
+                        callbacks: {
+                            label: function(context) {
+                                const chart = context.chart;
+                                const value = context.raw;
+                                const datapoints = chart.data.datasets[0].data;
+                                let total;
+                                if (chart.config.type === 'pie' || chart.config.type === 'doughnut') {
+                                    total = 0;
+                                    for (let i = 0; i < datapoints.length; i++) {
+                                        if (chart.getDataVisibility(i)) {
+                                            total += datapoints[i];
+                                        }
+                                    }
+                                } else {
+                                    total = datapoints.reduce((a, b) => a + b, 0);
+                                }
+                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return ` Pessoas: ${value} (${percentage}%)`;
+                            },
+                            footer: function(tooltipItems) {
+                                const total = tooltipItems[0].chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                return `\nTotal (nos filtros): ${total}`;
+                            }
+                        }
+                    },
+                    datalabels: {
+                        formatter: (value, context) => {
+                            const chart = context.chart;
+                            const datapoints = chart.data.datasets[0].data;
+                            let total;
+                            if (chart.config.type === 'pie' || chart.config.type === 'doughnut') {
+                                total = 0;
+                                for (let i = 0; i < datapoints.length; i++) {
+                                    if (chart.getDataVisibility(i)) {
+                                        total += datapoints[i];
+                                    }
+                                }
+                            } else {
+                                total = datapoints.reduce((a, b) => a + b, 0);
+                            }
+                            if (total === 0) return '';
+                            const percentage = (value / total) * 100;
+                            if (percentage < 3) return '';
+                            return percentage.toFixed(1) + '%';
+                        },
+                        color: '#ffffff',
+                        font: {
+                            weight: 'bold',
+                            size: 16,
+                        }
+                    }
+                }
+            }
         });
     }
 
-    // --- Adiciona "escutadores" de eventos para TODOS os filtros ---
+    // --- Adiciona listeners ---
     const allFilters = [
         genderFilter, chartTypeSelector, minAgeInput, maxAgeInput, minHeightInput, maxHeightInput,
-        minWeightInput, maxWeightInput, minSbpInput, maxSbpInput, 
+        minWeightInput, maxWeightInput, minSbpInput, maxSbpInput,
         minWaistlineInput, maxWaistlineInput, minSightLeftInput, maxSightLeftInput,
         minSightRightInput, maxSightRightInput, hearLeftFilter, hearRightFilter
     ];

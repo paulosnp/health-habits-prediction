@@ -6,6 +6,8 @@
     <title>Bases de Dados</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    
     <link rel="shortcut icon" href="smoking.png" type="image/x-icon">
 </head>
 <body>
@@ -117,16 +119,19 @@
             </aside>
 
             <main class="chart-area">
-                <div class="chart-container">
+                <div id="loader" class="loader-container">
+                    <div class="loader-spinner"></div>
+                    <p>Carregando dados, por favor aguarde...</p>
+                </div>
+
+                <div class="chart-container" style="display: none;">
                     <canvas id="myChart"></canvas>
                 </div>
             </main>
 
         </div>
     </div>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    
+
     <script src="script.js"></script>
 
 </body>
