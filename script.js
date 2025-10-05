@@ -74,6 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             fullData = jsonData;
+
+            // O console.log de diagnóstico foi removido, pois o problema foi resolvido.
             updateChart();
 
         } catch (error) {
@@ -117,18 +119,27 @@ document.addEventListener('DOMContentLoaded', () => {
             chartContainer.classList.remove('small-chart');
         }
         
-        // --- Filtragem dos dados ---
+        // --- Filtragem dos dados (A CORREÇÃO ESTÁ AQUI) ---
         const filteredData = fullData.filter(person => {
             const passesGender = selectedGender === 'Todos' || person.sex === selectedGender;
             const passesAge = (isNaN(minAge) || person.age >= minAge) && (isNaN(maxAge) || person.age <= maxAge);
-            const passesHeight = (isNaN(minHeight) || person.height_cm >= minHeight) && (isNaN(maxHeight) || person.height_cm <= maxHeight);
-            const passesWeight = (isNaN(minWeight) || person.weight_kg >= minWeight) && (isNaN(maxWeight) || person.weight_kg <= maxWeight);
+            
+            // CORREÇÃO: Usando 'person.height' em vez de 'person.height_cm'
+            const passesHeight = (isNaN(minHeight) || person.height >= minHeight) && (isNaN(maxHeight) || person.height <= maxHeight);
+            
+            // CORREÇÃO: Usando 'person.weight' em vez de 'person.weight_kg'
+            const passesWeight = (isNaN(minWeight) || person.weight >= minWeight) && (isNaN(maxWeight) || person.weight <= maxWeight);
+            
             const passesSbp = (isNaN(minSbp) || person.SBP >= minSbp) && (isNaN(maxSbp) || person.SBP <= maxSbp);
-            const passesWaistline = (isNaN(minWaistline) || person.waistline_cm >= minWaistline) && (isNaN(maxWaistline) || person.waistline_cm <= maxWaistline);
+            
+            // CORREÇÃO: Usando 'person.waistline' (do diagnóstico) em vez de 'person.waistline_cm'
+            const passesWaistline = (isNaN(minWaistline) || person.waistline >= minWaistline) && (isNaN(maxWaistline) || person.waistline <= maxWaistline);
+            
             const passesSightLeft = (isNaN(minSightLeft) || person.sight_left >= minSightLeft) && (isNaN(maxSightLeft) || person.sight_left <= maxSightLeft);
             const passesSightRight = (isNaN(minSightRight) || person.sight_right >= minSightRight) && (isNaN(maxSightRight) || person.sight_right <= maxSightRight);
             const passesHearLeft = selectedHearLeft === 'Todos' || person.hear_left == selectedHearLeft;
             const passesHearRight = selectedHearRight === 'Todos' || person.hear_right == selectedHearRight;
+            
             return passesGender && passesAge && passesHeight && passesWeight && passesSbp && passesWaistline && passesSightLeft && passesSightRight && passesHearLeft && passesHearRight;
         });
 
@@ -180,10 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     legend: {
                         labels: {
-                            // A propriedade 'color' aqui é ignorada quando usamos 'generateLabels',
-                            // mas podemos deixar para referência.
                             color: '#ffffff',
-                            
                             generateLabels: function(chart) {
                                 const data = chart.data;
                                 if (data.labels.length && data.datasets.length) {
@@ -198,10 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                             lineWidth: style.borderWidth,
                                             hidden: !chart.getDataVisibility(i),
                                             index: i,
-                                            // ===============================================
-                                            // A CORREÇÃO FINAL ESTÁ NESTA LINHA:
                                             fontColor: '#ffffff'
-                                            // ===============================================
                                         };
                                     });
                                 }
