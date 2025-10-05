@@ -27,20 +27,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const hearRightFilter = document.getElementById('hear-right-filter');
     const ctx = document.getElementById('myChart').getContext('2d');
     const chartContainer = document.querySelector('.chart-container');
+
+    // --- Elementos do menu lateral ---
     const hamburgerBtn = document.getElementById('hamburger-btn');
     const closeSidebarBtn = document.getElementById('close-sidebar-btn');
     const sidebar = document.querySelector('.filter-sidebar');
     const overlay = document.querySelector('.overlay');
 
-    // --- Lógica do menu lateral ---
+    // --- Lógica do menu lateral (sidebar) ---
     function openSidebar() {
         sidebar.classList.remove('sidebar-closed');
         overlay.classList.add('active');
     }
+
     function closeSidebar() {
         sidebar.classList.add('sidebar-closed');
         overlay.classList.remove('active');
     }
+
     hamburgerBtn.addEventListener('click', openSidebar);
     closeSidebarBtn.addEventListener('click', closeSidebar);
     overlay.addEventListener('click', closeSidebar);
@@ -58,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(`Erro ao buscar o arquivo CSV: ${response.statusText}`);
             
             const csvText = await response.text();
+            
             const jsonData = await new Promise((resolve, reject) => {
                 Papa.parse(csvText, {
                     header: true,
@@ -73,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Não foi possível carregar ou processar os dados:", error);
+            const ctx = document.getElementById('myChart').getContext('2d');
             ctx.font = "16px Arial";
             ctx.fillStyle = "#e0e0e0";
             ctx.textAlign = "center";
@@ -105,14 +111,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedHearLeft = hearLeftFilter.value;
         const selectedHearRight = hearRightFilter.value;
 
-        // Ajusta o tamanho do container para gráficos de pizza/rosca
         if (chartType === 'pie' || chartType === 'doughnut') {
             chartContainer.classList.add('small-chart');
         } else {
             chartContainer.classList.remove('small-chart');
         }
         
-        // --- Filtragem dos dados com base nos inputs ---
+        // --- Filtragem dos dados ---
         const filteredData = fullData.filter(person => {
             const passesGender = selectedGender === 'Todos' || person.sex === selectedGender;
             const passesAge = (isNaN(minAge) || person.age >= minAge) && (isNaN(maxAge) || person.age <= maxAge);
@@ -133,17 +138,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (selectedMetric === 'smokers') {
             const smokerCount = filteredData.filter(p => p.SMK_stat_type_cd === 1).length;
             const nonSmokerCount = filteredData.length - smokerCount;
-            
             labels = ['Fumantes', 'Não Fumantes'];
             data = [smokerCount, nonSmokerCount];
             backgroundColors = ['#8C1007', '#6E9234'];
             borderColors = ['#3E0703', '#3E591E'];
             chartTitle = 'Distribuição de Fumantes (Com base nos filtros aplicados)';
-
         } else if (selectedMetric === 'drinkers') {
             const drinkerCount = filteredData.filter(p => p.DRK_YN === 'Y').length;
             const nonDrinkerCount = filteredData.length - drinkerCount;
-            
             labels = ['Alcoólatras', 'Não Alcoólatras'];
             data = [drinkerCount, nonDrinkerCount];
             backgroundColors = ['#0A4F8A', '#F7B801'];
@@ -177,25 +179,33 @@ document.addEventListener('DOMContentLoaded', () => {
                         color: '#ffffff'
                     },
                     legend: {
-                        onClick: (e, legendItem, legend) => {
-                            Chart.defaults.plugins.legend.onClick.call(this, e, legendItem, legend);
-                            legend.chart.update();
-                        },
                         labels: {
+                            // A propriedade 'color' aqui é ignorada quando usamos 'generateLabels',
+                            // mas podemos deixar para referência.
+                            color: '#ffffff',
+                            
                             generateLabels: function(chart) {
                                 const data = chart.data;
-                                return data.labels.map((label, i) => ({
-                                    text: label,
-                                    fillStyle: data.datasets[0].backgroundColor[i],
-                                    strokeStyle: data.datasets[0].borderColor[i],
-                                    lineWidth: data.datasets[0].borderWidth,
-                                    hidden: !chart.getDataVisibility(i),
-                                    index: i,
-                                    // ===============================================
-                                    // A CORREÇÃO DEFINITIVA ESTÁ NESTA LINHA:
-                                    fontColor: '#ffffff'
-                                    // ===============================================
-                                }));
+                                if (data.labels.length && data.datasets.length) {
+                                    return data.labels.map((label, i) => {
+                                        const meta = chart.getDatasetMeta(0);
+                                        const style = meta.controller.getStyle(i);
+
+                                        return {
+                                            text: label,
+                                            fillStyle: style.backgroundColor,
+                                            strokeStyle: style.borderColor,
+                                            lineWidth: style.borderWidth,
+                                            hidden: !chart.getDataVisibility(i),
+                                            index: i,
+                                            // ===============================================
+                                            // A CORREÇÃO FINAL ESTÁ NESTA LINHA:
+                                            fontColor: '#ffffff'
+                                            // ===============================================
+                                        };
+                                    });
+                                }
+                                return [];
                             }
                         }
                     },
