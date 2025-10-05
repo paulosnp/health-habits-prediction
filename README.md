@@ -31,7 +31,7 @@ Para visualizar este projeto localmente, siga os passos abaixo:
 3.  **Baixe a base de dados (JSON):**
     O arquivo de dados principal não está incluído no repositório. Use o link abaixo para fazer o download direto e coloque o arquivo na pasta raiz do projeto.
 
-    * **➡️ Link para download direto:** **<a href="https://drive.google.com/file/d/15GDdq2xXjxfM3UXDD92fzTz9MtuIGLhY/view?usp=sharing" target="_blank" rel="noopener noreferrer">Clique aqui para baixar o arquivo JSON</a>**
+    * **➡️ Link para download direto:** **<a href="https://github.com/paulosnp/health-habits-prediction/releases/download/data/smoking_drinking_data.json" target="_blank" rel="noopener noreferrer">Clique aqui para baixar o arquivo JSON</a>**
     * **Importante:** Após o download, verifique se o nome do arquivo corresponde ao nome esperado no código JavaScript ou renomeie o arquivo conforme necessário.
 
 4.  **Abra o projeto:**
