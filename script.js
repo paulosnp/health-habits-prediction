@@ -25,9 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const hearRightFilter = document.getElementById('hear-right-filter');
 
     const ctx = document.getElementById('myChart').getContext('2d');
-    const chartContainer = document.querySelector('.chart-container'); // NOVO: Pega o container do gráfico
+    const chartContainer = document.querySelector('.chart-container');
 
-    // --- NOVO: Lógica para controlar o menu lateral ---
+    // --- Lógica para controlar o menu lateral ---
     const hamburgerBtn = document.getElementById('hamburger-btn');
     const closeSidebarBtn = document.getElementById('close-sidebar-btn');
     const sidebar = document.querySelector('.filter-sidebar');
@@ -46,22 +46,49 @@ document.addEventListener('DOMContentLoaded', () => {
     hamburgerBtn.addEventListener('click', openSidebar);
     closeSidebarBtn.addEventListener('click', closeSidebar);
     overlay.addEventListener('click', closeSidebar);
-    // --- FIM DA NOVA LÓGICA ---
-
-
+    
+    // --- ✅ FUNÇÃO ALTERADA PARA LER CSV ---
     async function loadData() {
+        // IMPORTANTE: Coloque aqui a URL para o seu arquivo .csv no GitHub Releases
+        const urlExterna = 'https://pub-30aea22574314423a80babb2f0c54df3.r2.dev/smoking_driking_dataset_Ver01.csv';
+
+        // Mostra a mensagem de carregamento no canvas
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.font = "20px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("Carregando dados, por favor aguarde...", ctx.canvas.width / 2, ctx.canvas.height / 2);
+
         try {
-            const response = await fetch('smoking_drinking_data.json');
+            console.log("1. Iniciando o fetch do arquivo CSV...");
+            const response = await fetch(urlExterna);
             if (!response.ok) { throw new Error(`Erro HTTP! status: ${response.status}`); }
-            fullData = await response.json();
-            updateChart();
+
+            const csvText = await response.text();
+            console.log("2. CSV baixado, iniciando a interpretação (parse)...");
+
+            // Usa a biblioteca Papa Parse para converter o texto CSV
+            Papa.parse(csvText, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    console.log("3. Interpretação concluída! Dados prontos.");
+                    fullData = results.data;
+                    
+                    console.log("4. Chamando a função para atualizar o gráfico...");
+                    updateChart();
+                }
+            });
+
         } catch (error) {
-            console.error("Não foi possível carregar os dados:", error);
+            console.error("ERRO ao carregar ou interpretar o CSV:", error);
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             ctx.font = "16px Arial";
             ctx.fillText("Falha ao carregar os dados. Verifique o console.", 10, 50);
         }
     }
 
+    // --- NENHUMA ALTERAÇÃO DAQUI PARA BAIXO ---
     function updateChart() {
         // --- 1. Lê o valor de TODOS os filtros ---
         const selectedGender = genderFilter.value;
@@ -83,7 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedHearLeft = hearLeftFilter.value;
         const selectedHearRight = hearRightFilter.value;
 
-        // --- NOVO: Adiciona/remove classe para ajustar o tamanho do gráfico ---
         if (chartType === 'pie' || chartType === 'doughnut') {
             chartContainer.classList.add('small-chart');
         } else {
