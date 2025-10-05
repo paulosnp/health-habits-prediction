@@ -1,11 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Registra o plugin de rótulos
+    // Registra o plugin de rótulos para que ele funcione
     Chart.register(ChartDataLabels);
 
     let myChart = null;
     let fullData = [];
 
-    // --- Pega todos os elementos ---
+    // --- Pega todos os elementos do HTML ---
     const genderFilter = document.getElementById('gender-filter');
     const chartTypeSelector = document.getElementById('chart-type-selector');
     const minAgeInput = document.getElementById('min-age');
@@ -44,22 +44,47 @@ document.addEventListener('DOMContentLoaded', () => {
     closeSidebarBtn.addEventListener('click', closeSidebar);
     overlay.addEventListener('click', closeSidebar);
     
-    // --- Carregamento de dados ---
+    // --- Carregamento de dados via CSV do Cloudflare R2 ---
     async function loadData() {
         const loader = document.getElementById('loader');
         loader.style.display = 'flex';
         chartContainer.style.display = 'none';
+
+        // !!! IMPORTANTE: Cole aqui a URL pública do seu arquivo CSV no Cloudflare R2
+        const csvUrl = 'https://pub-30aea22574314423a80babb2f0c54df3.r2.dev/smoking_driking_dataset_Ver01.csv';
+
         try {
-            const response = await fetch('smoking_drinking_data.json');
-            if (!response.ok) throw new Error(`Erro HTTP! status: ${response.status}`);
-            fullData = await response.json();
+            const response = await fetch(csvUrl);
+            if (!response.ok) {
+                throw new Error(`Erro ao buscar o arquivo CSV: ${response.statusText}`);
+            }
+            const csvText = await response.text();
+
+            const jsonData = await new Promise((resolve, reject) => {
+                Papa.parse(csvText, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    complete: (results) => {
+                        if (results.errors.length) {
+                            reject(new Error(results.errors[0].message));
+                        } else {
+                            resolve(results.data);
+                        }
+                    },
+                    error: (error) => reject(error)
+                });
+            });
+
+            fullData = jsonData;
             updateChart();
+
         } catch (error) {
-            console.error("Não foi possível carregar os dados:", error);
+            console.error("Não foi possível carregar ou processar os dados:", error);
             ctx.font = "16px Arial";
             ctx.fillStyle = "#e0e0e0";
             ctx.textAlign = "center";
-            ctx.fillText("Falha ao carregar os dados. Verifique o console.", ctx.canvas.width / 2, 50);
+            ctx.fillText("Falha ao carregar os dados. Verifique a URL e o console.", ctx.canvas.width / 2, 50);
         } finally {
             loader.style.display = 'none';
             chartContainer.style.display = 'block';
@@ -67,7 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateChart() {
-        // --- Leitura e filtragem dos dados ---
         const chartType = chartTypeSelector.value;
         const selectedGender = genderFilter.value;
         const minAge = parseFloat(minAgeInput.value);
@@ -107,8 +131,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return passesGender && passesAge && passesHeight && passesWeight && passesSbp && passesWaistline && passesSightLeft && passesSightRight && passesHearLeft && passesHearRight;
         });
 
-        const smokerCount = filteredData.filter(p => p.SMK_stat_type_cd === 1.0).length;
-        const nonSmokerCount = filteredData.filter(p => p.SMK_stat_type_cd !== 1.0).length;
+        const smokerCount = filteredData.filter(p => p.SMK_stat_type_cd === 1).length;
+        const nonSmokerCount = filteredData.filter(p => p.SMK_stat_type_cd !== 1).length;
 
         const chartData = {
             labels: ['Fumantes', 'Não Fumantes'],
@@ -136,7 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     legend: {
                         labels: {
-                            // A função generateLabels agora define a cor do texto diretamente
                             generateLabels: function(chart) {
                                 const data = chart.data;
                                 return data.labels.map((label, i) => ({
@@ -146,7 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                     lineWidth: data.datasets[0].borderWidth,
                                     hidden: !chart.getDataVisibility(i),
                                     index: i,
-                                    // *** COR DO TEXTO DA LEGENDA ADICIONADA AQUI ***
                                     fontColor: '#ffffff' 
                                 }));
                             }
@@ -214,7 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Adiciona listeners ---
     const allFilters = [
         genderFilter, chartTypeSelector, minAgeInput, maxAgeInput, minHeightInput, maxHeightInput,
         minWeightInput, maxWeightInput, minSbpInput, maxSbpInput,
